@@ -7,11 +7,16 @@ import com.chunkworks.quickslot.client.ClientSetup;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Screenshot;
+import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.inventory.ClickType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -40,6 +45,35 @@ public final class NetworkClient {
                 completed = NetworkFiles.sequence(command);
                 switch (command.get("op").getAsString()) {
                     case "key" -> KeyMapping.click(ClientSetup.SWAP.getKey());
+                    case "inventory" -> KeyMapping.click(game.options.keyInventory.getKey());
+                    case "attack" -> KeyMapping.click(game.options.keyAttack.getKey());
+                    case "mouse" -> {
+                        if (!(game.screen instanceof AbstractContainerScreen<?> screen)) throw new IllegalStateException("No inventory screen");
+                        double x = screen.getGuiLeft() + command.get("x").getAsDouble();
+                        double y = screen.getGuiTop() + command.get("y").getAsDouble();
+                        screen.mouseClicked(x, y, 0); screen.mouseReleased(x, y, 0);
+                    }
+                    case "closeGui" -> { if (game.screen != null) game.screen.onClose(); }
+                    case "mouseSlot" -> {
+                        if (!(game.screen instanceof AbstractContainerScreen<?> screen)) throw new IllegalStateException("No inventory screen");
+                        var slot = screen.getMenu().getSlot(command.get("slot").getAsInt());
+                        screen.mouseClicked(screen.getGuiLeft() + slot.x + 8, screen.getGuiTop() + slot.y + 8,
+                                command.get("button").getAsInt());
+                        screen.mouseReleased(screen.getGuiLeft() + slot.x + 8, screen.getGuiTop() + slot.y + 8,
+                                command.get("button").getAsInt());
+                    }
+                    case "menuClick" -> game.gameMode.handleInventoryMouseClick(0, command.get("slot").getAsInt(),
+                            command.get("button").getAsInt(), ClickType.valueOf(command.get("type").getAsString()), game.player);
+                    case "hud" -> {
+                        game.options.mainHand().set(HumanoidArm.valueOf(command.get("arm").getAsString()));
+                        game.options.attackIndicator().set(AttackIndicatorStatus.valueOf(command.get("attack").getAsString()));
+                        game.options.broadcastOptions();
+                    }
+                    case "capture" -> {
+                        String name = command.get("name").getAsString();
+                        if (!name.matches("[a-z0-9_-]+\\.png")) throw new IllegalArgumentException("Unsafe screenshot name");
+                        Screenshot.grab(game.gameDirectory, name, game.getMainRenderTarget(), message -> {});
+                    }
                     case "request" -> PacketDistributor.sendToServer(new Payloads.Swap(command.get("selected").getAsInt(),
                             command.has("revision") ? command.get("revision").getAsLong() : SlotData.revision(game.player)));
                     case "disconnect" -> { connect = false; game.disconnect(new TitleScreen()); }
@@ -62,6 +96,11 @@ public final class NetworkClient {
         state.addProperty("stowed", ModList.get().isLoaded("stowed"));
         state.addProperty("connected", game.player != null && game.getConnection() != null);
         state.addProperty("screen", game.screen == null ? "none" : game.screen.getClass().getSimpleName());
+        if (game.screen instanceof AbstractContainerScreen<?> screen) {
+            state.addProperty("guiLeft", screen.getGuiLeft()); state.addProperty("guiTop", screen.getGuiTop());
+            state.addProperty("guiWidth", game.getWindow().getGuiScaledWidth());
+            state.addProperty("guiHeight", game.getWindow().getGuiScaledHeight());
+        }
         if (game.player != null) state.addProperty("self", game.player.getGameProfile().getName());
         JsonObject players = new JsonObject();
         if (game.level != null) for (var player : game.level.players()) players.add(player.getGameProfile().getName(), NetworkFiles.player(player));

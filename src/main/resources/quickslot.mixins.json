@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.chunkworks.quickslot.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["InventoryMenuMixin"],
+  "client": [],
+  "injectors": {"defaultRequire": 1}
+}

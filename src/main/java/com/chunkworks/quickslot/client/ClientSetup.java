@@ -12,6 +12,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import org.lwjgl.glfw.GLFW;
@@ -33,6 +35,10 @@ public final class ClientSetup {
 
     /** effects: exposes the configurable swap key in Controls. */
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent event) { event.register(SWAP); }
+    /** effects: draws Quick Slot immediately above the ordinary hotbar layer. */
+    @SubscribeEvent public static void layers(RegisterGuiLayersEvent event) {
+        event.registerAbove(VanillaGuiLayers.HOTBAR, QuickSlot.id("slot"), SlotGui::hud);
+    }
     /** effects: installs the state receiver once the client mod is initialized. */
     @SubscribeEvent public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> Payloads.receiveOnClient(ClientSlot::receive));

@@ -2,6 +2,9 @@ modLoader="javafml"
 loaderVersion="[4,)"
 license="AGPL-3.0-or-later"
 
+[[mixins]]
+config="quickslot.mixins.json"
+
 [[mods]]
 modId="quickslot"
 version="${version}"

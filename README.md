@@ -3,8 +3,8 @@
 One extra player item stack for **Minecraft 1.21.1 / NeoForge 21.1.x**.
 Required on both client and server. Java 21, official Mojang mappings.
 
-**Development preview — unreleased.** Phase 1 has passed its automated gates. The HUD, clickable
-inventory slot, body display and dynamic-light integration are later phases.
+**Development preview — unreleased.** Storage/sync and the inventory/HUD phases have passed
+their current gates. Body display and dynamic-light integration are later phases.
 
 Press **H** to exchange the quick slot with the currently selected hotbar stack.
 Rebind **Swap Quick Slot** under Controls → Quick Slot. Scrolling still covers the
@@ -20,6 +20,18 @@ inventory unless keepInventory or `keepOnDeath` is enabled. Vanishing destroys i
 dropping death, matching vanilla. Server config lives in `quickslot-server.toml` in the
 world's `serverconfig/`: `itemBlocklist` prevents admission, while existing blocked items
 can still be removed with an empty hand.
+
+The survival/adventure inventory cell sits directly above offhand. Normal clicks split or
+exchange stacks; shift-click returns a quick-slot stack to inventory, merging compatible
+stacks first. Shift-clicking an inventory stack fills an empty quick slot after normal
+armor/offhand auto-equipping takes priority. Number-key exchanges and dropping use normal
+server menu transactions. The HUD mirrors your main arm, shows count/durability, and leaves
+space for the hotbar attack indicator. It briefly highlights a confirmed H swap.
+
+**Creative limitation:** use H. The clickable cell is disabled in creative inventory,
+whose vanilla item-creation protocol accepts only the original slot indices. Its other
+inventory controls remain usable. This guard avoids phantom stacks while preserving the
+server-only admission contract; broader creative-screen editing remains future work.
 
 ## Build and validation
 
@@ -46,7 +58,8 @@ See [the Phase 1 test record](knowledge/validation/phase-1.md) for the exact lim
 For a manual Phase 1 check in an isolated profile, hold a named or damaged tool, press H,
 select food, and press H again. The complete stacks should exchange, with a very subtle sound.
 Check H while driving and after dismounting, then repeat the exchange after relog or death.
-There is no on-screen quick-slot cell or body display in this phase. Full-pack input conflicts,
+The slot now appears on the HUD and in survival/adventure inventory; body display is not
+implemented yet. Full-pack input conflicts,
 controller bindings and human judgement of sound volume remain later compatibility checks.
 
 Body display will use the active resource-pack models, prioritizing **Refined Tools** where
@@ -54,6 +67,13 @@ provided. Its held 3D models must be resolved through the installed model-select
 the pack deliberately uses different models in GUI/fixed/ground contexts. Scale and clearance
 will be measured from the resolved body-display model and refreshed on F3+T. Quick Slot will
 not bundle or copy Refined Tools artwork. See [D-0003](knowledge/decisions/D-0003.md).
+Third-person size and orientation are explicit visual gates, including front, rear and
+side views, moving poses, both skin widths and worn equipment.
+
+Phase 2 passed 19 server GameTests (the original 12 plus seven menu tests), the 16 real-client
+Phase 1 regressions, and seven additional real-client inventory checks with SB/Curios loaded.
+Actual screenshots were inspected for the new cell, count/durability, mirrored HUD and active
+attack-indicator clearance. See [the Phase 2 record](knowledge/validation/phase-2.md).
 
 The official [NeoForge 1.21.1 ModDevGradle MDK](https://github.com/NeoForgeMDKs/MDK-1.21.1-ModDevGradle)
 provides the Gradle wrapper. The build pins NeoForge 21.1.248 and ModDevGradle 2.0.144,

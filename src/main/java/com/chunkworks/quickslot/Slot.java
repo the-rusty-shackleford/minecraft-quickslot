@@ -59,6 +59,22 @@ public final class Slot {
         return stack.isEmpty() || stack.getCount() > 0 && stack.getCount() <= stack.getMaxStackSize();
     }
 
+    /**
+     * requires: server game thread and a vanilla menu-owned working stack.
+     * effects: commits menu edits; permits partial withdrawal of a newly blocked item.
+     * throws: IllegalArgumentException for invalid/admitted blocked stacks, or
+     * IllegalStateException on a client. Clients cannot invoke this operation by payload.
+     */
+    public static void replaceFromMenu(Player player, ItemStack stack) {
+        if (player.level().isClientSide) throw new IllegalStateException("Server-owned inventory");
+        ItemStack prior = player.getData(SlotData.STACK);
+        boolean withdrawal = ItemStack.isSameItemSameComponents(prior, stack) && stack.getCount() <= prior.getCount();
+        if (!valid(stack) || !(withdrawal || ServerRules.permits(stack))) throw new IllegalArgumentException("Invalid menu stack");
+        if (ItemStack.matches(prior, stack)) return;
+        store(player, stack);
+        broadcast(player, false);
+    }
+
     private static void store(Player player, ItemStack stack) {
         player.setData(SlotData.STACK, stack.copy());
         player.setData(SlotData.REVISION, Math.incrementExact(SlotData.revision(player)));

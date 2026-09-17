@@ -89,7 +89,7 @@ def _settle() -> None:
     _wait(lambda: _number(_read("server").get("tick")) >= before + 15, "server advances after request")
 
 
-def main() -> None:
+def main(close: bool = True) -> None:
     """requires: three isolated test runs are active; effects: asserts and records live behavior."""
     if _player("server").get("alive") is False:
         _send("driver", "respawn")
@@ -207,8 +207,9 @@ def main() -> None:
     _pass("dismount restores H to Quick Slot")
 
     print(f"PASS: {len(RESULTS)} dedicated-server/two-client checks", flush=True)
-    for role in ["driver", "observer", "server"]:
-        _send(role, "quit")
+    if close:
+        for role in ["driver", "observer", "server"]:
+            _send(role, "quit")
 
 
 if __name__ == "__main__":

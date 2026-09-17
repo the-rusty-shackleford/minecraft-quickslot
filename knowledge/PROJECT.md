@@ -19,6 +19,9 @@ Rusty's 2026-09-17 answers govern over the original recommendations:
 9. Body scale is a priority: fit the player naturally, avoiding both oversized and undersized displays.
 10. Prefer Refined Tools models where available. Preserve active resource-pack selection and
     size the resolved 3D model, including context/component-dependent variants; refresh on F3+T.
+11. Third-person presentation is an explicit acceptance gate: inspect front, rear and both
+    sides at normal camera distance, plus moving poses, wide/slim skins and worn equipment.
+    Judge both scale and orientation in the real game before accepting body placement.
 
 Rusty's subsequent input-priority correction assigns H to Quick Slot outside driving;
 Vanilla Wheels lights take priority for the driver. Passengers keep Quick Slot. Stowed
@@ -49,10 +52,14 @@ where possible and clean up owned instances, not a hard one-client limit. Do not
 Phase 1 passed 19 JUnit tests, 12 real-server GameTests and 16 two-real-client/dedicated-server
 checks on 2026-09-17. Both clients and the server were shut down afterward, verified through
 host processes. See [validation/phase-1.md](validation/phase-1.md) for coverage and limitations.
-No HUD, inventory injection or body rendering yet. Phase 2 starts with the inventory layout preview.
+Phase 2 now has the HUD and inventory injection. Body rendering has not started yet.
 The current proposal places its inventory item at (77, 42), directly above the existing
 offhand item at (77, 62). HUD placement mirrors the main arm and reserves attack-indicator
-space. The local interactive preview has been presented; acknowledgement is pending.
+space. Rusty approved the local interactive preview and InventoryMenu injection approach;
+Phase 2 passed 19 server GameTests, the 16 real-client Phase 1 regressions and seven menu
+checks on two clients with SB/Curios loaded. Active attack-indicator clearance was inspected
+on both sides in a separate single-client capture. See validation/phase-2.md for limitations,
+including creative mode using H while its menu cell is disabled.
 Server blocklist/retention config is included now because Phase 1 admission/death tests require it;
 the remaining client configuration belongs to later phases. No production pack was changed.
 

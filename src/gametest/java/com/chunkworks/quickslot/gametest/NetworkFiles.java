@@ -5,6 +5,7 @@ import com.chunkworks.quickslot.SlotData;
 import com.chunkworks.quickslot.compat.Driving;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,6 +55,14 @@ final class NetworkFiles {
         json.addProperty("spectator", player.isSpectator());
         json.add("quick", stack(SlotData.copy(player)));
         json.add("held", stack(player.getMainHandItem()));
+        json.add("cursor", stack(player.inventoryMenu.getCarried()));
+        JsonArray inventory = new JsonArray();
+        for (int i = 0; i < 36; i++) inventory.add(stack(player.getInventory().getItem(i)));
+        json.add("inventory", inventory);
+        for (var slot : player.inventoryMenu.slots) if (slot instanceof com.chunkworks.quickslot.menu.QuickMenuSlot) {
+            json.addProperty("quickIndex", slot.index);
+            json.add("menuQuick", stack(slot.getItem()));
+        }
         if (ModList.get().isLoaded("vanillawheels")) WheelsFixture.describe(player, json);
         return json;
     }
