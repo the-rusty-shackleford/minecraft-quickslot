@@ -9,6 +9,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.AttackIndicatorStatus;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -47,6 +48,33 @@ public final class NetworkClient {
                     case "key" -> KeyMapping.click(ClientSetup.SWAP.getKey());
                     case "inventory" -> KeyMapping.click(game.options.keyInventory.getKey());
                     case "attack" -> KeyMapping.click(game.options.keyAttack.getKey());
+                    case "view" -> {
+                        game.options.setCameraType(CameraType.valueOf(command.get("camera").getAsString()));
+                        game.options.hideGui = command.has("hide") && command.get("hide").getAsBoolean();
+                        if (command.has("fov")) game.options.fov().set(command.get("fov").getAsInt());
+                        game.options.bobView().set(false);
+                        if (command.has("yaw")) {
+                            game.player.setYRot(command.get("yaw").getAsFloat());
+                            game.player.setYHeadRot(command.get("yaw").getAsFloat());
+                            game.player.setYBodyRot(command.get("yaw").getAsFloat());
+                        }
+                        if (command.has("pitch")) game.player.setXRot(command.get("pitch").getAsFloat());
+                        if (command.has("width")) org.lwjgl.glfw.GLFW.glfwSetWindowSize(game.getWindow().getWindow(),
+                                command.get("width").getAsInt(), command.get("height").getAsInt());
+                    }
+                    case "sneak" -> game.options.keyShift.setDown(command.get("value").getAsBoolean());
+                    case "resourceReload" -> game.reloadResourcePacks();
+                    case "packs" -> {
+                        var packs = new java.util.ArrayList<String>();
+                        packs.add("vanilla"); packs.add("mod_resources");
+                        if (command.get("refined").getAsBoolean()) packs.add("file/Refined Tools 3.0");
+                        game.getResourcePackRepository().setSelected(packs);
+                        game.reloadResourcePacks();
+                    }
+                    case "walk" -> {
+                        game.options.keyUp.setDown(command.get("value").getAsBoolean());
+                        game.options.keySprint.setDown(command.has("sprint") && command.get("sprint").getAsBoolean());
+                    }
                     case "mouse" -> {
                         if (!(game.screen instanceof AbstractContainerScreen<?> screen)) throw new IllegalStateException("No inventory screen");
                         double x = screen.getGuiLeft() + command.get("x").getAsDouble();
@@ -96,12 +124,16 @@ public final class NetworkClient {
         state.addProperty("stowed", ModList.get().isLoaded("stowed"));
         state.addProperty("connected", game.player != null && game.getConnection() != null);
         state.addProperty("screen", game.screen == null ? "none" : game.screen.getClass().getSimpleName());
+        state.addProperty("reloading", game.getOverlay() != null);
         if (game.screen instanceof AbstractContainerScreen<?> screen) {
             state.addProperty("guiLeft", screen.getGuiLeft()); state.addProperty("guiTop", screen.getGuiTop());
             state.addProperty("guiWidth", game.getWindow().getGuiScaledWidth());
             state.addProperty("guiHeight", game.getWindow().getGuiScaledHeight());
         }
-        if (game.player != null) state.addProperty("self", game.player.getGameProfile().getName());
+        if (game.player != null) {
+            state.addProperty("self", game.player.getGameProfile().getName());
+            state.addProperty("skin", game.player.getSkin().model().toString());
+        }
         JsonObject players = new JsonObject();
         if (game.level != null) for (var player : game.level.players()) players.add(player.getGameProfile().getName(), NetworkFiles.player(player));
         state.add("players", players);

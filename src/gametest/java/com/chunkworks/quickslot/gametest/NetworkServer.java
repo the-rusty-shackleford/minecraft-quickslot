@@ -61,6 +61,18 @@ public final class NetworkServer {
         if (op.equals("quit")) { server.halt(false); return; }
         if (player == null) throw new IllegalStateException("Target not connected");
         switch (op) {
+            case "booth" -> {
+                player.serverLevel().setDayTime(6000);
+                player.serverLevel().setWeatherParameters(60000, 0, false, false);
+                server.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
+                server.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
+                server.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
+                platform(player, 0);
+                player.teleportTo(player.serverLevel(), 0, 71, 0, 0, 0);
+            }
+            case "position" -> player.teleportTo(player.serverLevel(), command.get("x").getAsDouble(),
+                    command.get("y").getAsDouble(), command.get("z").getAsDouble(),
+                    command.get("yaw").getAsFloat(), command.get("pitch").getAsFloat());
             case "seed" -> {
                 player.stopRiding();
                 player.getInventory().clearContent();
@@ -69,6 +81,11 @@ public final class NetworkServer {
                 player.setGameMode(GameType.SURVIVAL);
                 player.getFoodData().setFoodLevel(20);
                 Slot.replace(player, item(command.getAsJsonObject("quick")));
+                if (command.has("fireAspect") && command.get("fireAspect").getAsBoolean()) {
+                    ItemStack burning = com.chunkworks.quickslot.SlotData.copy(player);
+                    burning.enchant(server.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT), 1);
+                    Slot.replace(player, burning);
+                }
                 if (command.has("vanishing") && command.get("vanishing").getAsBoolean()) {
                     ItemStack cursed = com.chunkworks.quickslot.SlotData.copy(player);
                     cursed.enchant(server.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.VANISHING_CURSE), 1);

@@ -52,7 +52,11 @@ where possible and clean up owned instances, not a hard one-client limit. Do not
 Phase 1 passed 19 JUnit tests, 12 real-server GameTests and 16 two-real-client/dedicated-server
 checks on 2026-09-17. Both clients and the server were shut down afterward, verified through
 host processes. See [validation/phase-1.md](validation/phase-1.md) for coverage and limitations.
-Phase 2 now has the HUD and inventory injection. Body rendering has not started yet.
+Phase 2 has the HUD and inventory injection. Phase 3 now has the body layer, measured model
+fitting, classification and initial optional tags. Real captures cover wide/slim skins,
+front/rear/sides, both main arms, Refined Tools/vanilla reload, glint and Fire Aspect variants.
+Crouching head clearance remains an observed defect for the Phase 4 clearance pass;
+equipment/shader/full-pack visual acceptance is not complete. See validation/phase-3.md.
 The current proposal places its inventory item at (77, 42), directly above the existing
 offhand item at (77, 62). HUD placement mirrors the main arm and reserves attack-indicator
 space. Rusty approved the local interactive preview and InventoryMenu injection approach;

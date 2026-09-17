@@ -41,7 +41,7 @@ neoForge {
         networkObserver {
             client(); sourceSet = sourceSets.gametest
             gameDirectory = file('run/network-observer')
-            programArgument '--username'; programArgument 'QuickObserver'
+            programArgument '--username'; programArgument providers.gradleProperty('quickslotObserverName').getOrElse('QuickObserver')
             systemProperty 'quickslot.testRole', 'observer'
         }
         matching { it.name.startsWith('network') }.configureEach {

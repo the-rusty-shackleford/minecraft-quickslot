@@ -4,7 +4,8 @@ One extra player item stack for **Minecraft 1.21.1 / NeoForge 21.1.x**.
 Required on both client and server. Java 21, official Mojang mappings.
 
 **Development preview — unreleased.** Storage/sync and the inventory/HUD phases have passed
-their current gates. Body display and dynamic-light integration are later phases.
+their current gates. Initial body display is implemented; equipment clearance and
+dynamic-light integration are still in development.
 
 Press **H** to exchange the quick slot with the currently selected hotbar stack.
 Rebind **Swap Quick Slot** under Controls → Quick Slot. Scrolling still covers the
@@ -58,17 +59,28 @@ See [the Phase 1 test record](knowledge/validation/phase-1.md) for the exact lim
 For a manual Phase 1 check in an isolated profile, hold a named or damaged tool, press H,
 select food, and press H again. The complete stacks should exchange, with a very subtle sound.
 Check H while driving and after dismounting, then repeat the exchange after relog or death.
-The slot now appears on the HUD and in survival/adventure inventory; body display is not
-implemented yet. Full-pack input conflicts,
+The slot appears on the HUD, in survival/adventure inventory, and on player models.
+Full-pack input conflicts,
 controller bindings and human judgement of sound volume remain later compatibility checks.
 
-Body display will use the active resource-pack models, prioritizing **Refined Tools** where
-provided. Its held 3D models must be resolved through the installed model-selection path;
+Body display uses active resource-pack models, including **Refined Tools** where
+provided. Its 3D models resolve through the installed model-selection path;
 the pack deliberately uses different models in GUI/fixed/ground contexts. Scale and clearance
-will be measured from the resolved body-display model and refreshed on F3+T. Quick Slot will
-not bundle or copy Refined Tools artwork. See [D-0003](knowledge/decisions/D-0003.md).
+are measured from vertices emitted by the actual body-display renderer and refreshed on F3+T.
+Quick Slot does not bundle or copy Refined Tools artwork. See [D-0003](knowledge/decisions/D-0003.md).
 Third-person size and orientation are explicit visual gates, including front, rear and
 side views, moving poses, both skin widths and worn equipment.
+
+Large tools use the back; small items use the belt. Consumables have bottle, pouch, bowl
+and hanging styles. Exactly one item is displayed, regardless of stack size. Ordinary blocks,
+armor and feast blocks are hidden; torches and lanterns have explicit visible belt overrides.
+Dynamic light from this slot is not implemented yet. Default classification tags live under
+`data/quickslot/tags/item/`; optional entries support Farmer's Delight, Create and other items.
+
+Phase 3 has 26 domain tests and 19 server tests, plus real-client captures of both skin widths,
+four viewing angles, Refined Tools/vanilla reload, enchanted model variants and H clearing the
+back render. Crouching head clearance, worn equipment, shaders and full-pack compatibility
+are not accepted yet. See [the Phase 3 record](knowledge/validation/phase-3.md).
 
 Phase 2 passed 19 server GameTests (the original 12 plus seven menu tests), the 16 real-client
 Phase 1 regressions, and seven additional real-client inventory checks with SB/Curios loaded.

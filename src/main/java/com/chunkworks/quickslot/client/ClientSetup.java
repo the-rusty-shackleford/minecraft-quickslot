@@ -13,6 +13,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
@@ -32,6 +36,18 @@ public final class ClientSetup {
     };
     public static final KeyMapping SWAP = new KeyMapping("key.quickslot.swap", ON_FOOT,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, "key.categories.quickslot");
+
+    /** effects: attaches the body item layer to both player skin models. */
+    @SubscribeEvent public static void bodyLayers(EntityRenderersEvent.AddLayers event) {
+        for (var skin : event.getSkins()) {
+            PlayerRenderer renderer = event.getSkin(skin);
+            if (renderer != null) renderer.addLayer(new BodyLayer(renderer));
+        }
+    }
+    /** effects: clears measured models when the resource pack selection changes or F3+T runs. */
+    @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((ResourceManagerReloadListener) resources -> BodyLayer.clear());
+    }
 
     /** effects: exposes the configurable swap key in Controls. */
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent event) { event.register(SWAP); }
