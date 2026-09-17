@@ -56,9 +56,7 @@ public final class ClientSetup {
         if (event.getConfig().getSpec() == ClientRules.SPEC) {
             // TOML edits may arrive on the file watcher thread; presentation caches are
             // render-thread confined. Unloading has no config values left to read.
-            if (!(event instanceof ModConfigEvent.Unloading)) Minecraft.getInstance().execute(() -> {
-                EquipmentClearance.reload(); BodyLayer.clear();
-            });
+            if (!(event instanceof ModConfigEvent.Unloading)) Minecraft.getInstance().execute(BodyLayer::clear);
         }
     }
 

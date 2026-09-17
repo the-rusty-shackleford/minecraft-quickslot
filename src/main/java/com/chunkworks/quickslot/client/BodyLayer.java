@@ -17,12 +17,10 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.Tags;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -34,12 +32,11 @@ import org.joml.Quaternionf;
  */
 public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private record Entry(ItemStack source, ItemStack display, Presentation.Kind kind, RenderedBounds.Shape shape,
-            Placements.Override override, Quaternionf rotation, HeadClearance head) {}
+            Placements.Override override, Quaternionf rotation) {}
     private static final Map<AbstractClientPlayer, Entry> ENTRIES = new WeakHashMap<>();
     private final PoseStack local = new PoseStack();
     private final Matrix4f holder = new Matrix4f();
     private Anchor fittedAnchor;
-    private double fittedArmor;
     /** effects: creates a body layer for a wide or slim player renderer. */
     public BodyLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) { super(parent); }
     /** effects: invalidates reload-derived classification and model measurements. */
@@ -48,6 +45,7 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
     private static Entry entry(AbstractClientPlayer player, ItemStack source, int light) {
         ItemStack display = source.copyWithCount(1);
         var kind = ItemPresentation.of(display);
+        boolean bowlMeal = kind.style() == Presentation.Style.BOWL;
         var override = Placements.get(BuiltInRegistries.ITEM.getKey(display.getItem()));
         Quaternionf rotation = new Quaternionf();
         if (override != null) {
@@ -55,12 +53,15 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             var r = override.transform().rotation();
             rotation.rotationXYZ((float) Math.toRadians(r.x()), (float) Math.toRadians(r.y()), (float) Math.toRadians(r.z()));
         }
+        if (bowlMeal || kind.style() == Presentation.Style.BOWL)
+            kind = new Presentation.Kind(Anchor.HIDDEN, Presentation.Style.BOWL);
         return new Entry(source, display, kind, kind.anchor() == Anchor.HIDDEN ? null
-                : RenderedBounds.measure(player, display, light), override, rotation, new HeadClearance());
+                : RenderedBounds.measure(player, display, light), override, rotation);
     }
     @Override public void render(PoseStack pose, MultiBufferSource buffers, int light, AbstractClientPlayer player,
             float swing, float amount, float partial, float age, float yaw, float pitch) {
-        if (!ClientRules.RENDER.get() || player.isInvisible() || player.isSpectator()) return;
+        if (!ClientRules.RENDER.get() || player.isInvisible() || player.isSpectator()
+                || EquipmentVisibility.elytra(player)) return;
         ItemStack source = player.getData(SlotData.STACK);
         if (source.isEmpty()) { ENTRIES.remove(player); return; }
         Entry entry = ENTRIES.get(player);
@@ -68,24 +69,14 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             entry = entry(player, source, light); ENTRIES.put(player, entry);
         }
         if (entry.kind().anchor() == Anchor.HIDDEN) return;
-        if (EquipmentClearance.cape(player) && entry.kind().anchor() == Anchor.BACK) return;
-        // Rusty's pocket-verse policy: wide equipment need not be forced around folded wings.
-        // An explicit hip/lower-back placement still opts into a resource author's tuned fit.
-        if (EquipmentClearance.elytra(player) && entry.kind().anchor() == Anchor.BACK
-                && (source.is(Tags.Items.TOOLS_SHIELD) || source.is(Tags.Items.TOOLS_BOW)
-                    || source.is(Tags.Items.TOOLS_CROSSBOW))) return;
+        if (EquipmentVisibility.cape(player) && entry.kind().anchor() == Anchor.BACK) return;
         int side = player.getMainArm() == HumanoidArm.RIGHT ? -1 : 1;
         fit(entry, player, side);
-        float push = fittedAnchor == Anchor.BACK ? entry.head().push(getParentModel(), player, entry.shape(), local.last().pose()) : 0;
-        // Obstructed poses use the same hidden-display fallback as obstructed equipment.
-        if (!Float.isFinite(push)) return;
         pose.pushPose();
         getParentModel().body.translateAndRotate(pose);
-        pose.translate(0, 0, push);
         if (fittedAnchor != Anchor.BACK) {
             if (fittedAnchor == Anchor.HIP) {
-                pose.pushPose(); pose.translate(side * fittedArmor, 0, fittedArmor);
-                BeltHolder.mount(pose, buffers, light, side); pose.popPose();
+                BeltHolder.mount(pose, buffers, light, side);
             }
             pose.pushPose(); pose.mulPose(holder);
             BeltHolder.render(entry.kind().style(), pose, buffers, light); pose.popPose();
@@ -99,20 +90,16 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         local.setIdentity();
         var b = entry.shape().bounds();
         Anchor anchor = entry.kind().anchor();
-        boolean elytra = EquipmentClearance.elytra(player), cape = EquipmentClearance.cape(player);
-        if (anchor == Anchor.LOWER_BACK && cape) anchor = Anchor.HIP;
-        boolean wingSideHang = anchor == Anchor.BACK && elytra;
-        if (wingSideHang) anchor = Anchor.HIP;
+        if (anchor == Anchor.LOWER_BACK && EquipmentVisibility.cape(player)) anchor = Anchor.HIP;
         fittedAnchor = anchor;
-        boolean flatten = anchor == Anchor.BACK || wingSideHang || entry.kind().style() == Presentation.Style.BOWL;
+        boolean flatten = anchor == Anchor.BACK;
         Presentation.Plane plane = flatten ? b.plane() : Presentation.Plane.XY;
         double depth = flatten ? b.flatDepth() : b.depth();
         double depthScale = entry.display().is(Items.SHIELD) ? 0.35 : 1;
-        double length = anchor == Anchor.BACK ? ClientRules.MAX_LENGTH.get() : wingSideHang
-                ? (entry.display().is(Items.SHIELD) ? 0.52 : 0.70) : switch (entry.kind().style()) {
+        double length = anchor == Anchor.BACK ? ClientRules.MAX_LENGTH.get() : switch (entry.kind().style()) {
             case BOTTLE -> ClientRules.BOTTLE_SCALE.get();
             case POUCH -> ClientRules.POUCH_SCALE.get();
-            case BOWL -> ClientRules.BOWL_SCALE.get();
+            case BOWL -> throw new IllegalStateException("Bowl meals have no body placement");
             case HANG -> ClientRules.HANG_SCALE.get();
             case TOOL -> 0.30;
         };
@@ -123,11 +110,6 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         length *= multiplier;
         if (anchor == Anchor.BACK) length = Math.min(length, ClientRules.MAX_LENGTH.get());
         double scale = b.fit(length);
-        double chest = EquipmentClearance.armor(player.getItemBySlot(EquipmentSlot.CHEST), EquipmentSlot.CHEST);
-        double legs = EquipmentClearance.armor(player.getItemBySlot(EquipmentSlot.LEGS), EquipmentSlot.LEGS);
-        double armor = anchor == Anchor.BACK ? chest : Math.max(chest, legs);
-        if (entry.override() != null) armor *= entry.override().armorMultiplier();
-        fittedArmor = armor;
         if (anchor == Anchor.BACK) {
             int shoulder = switch (ClientRules.BACK_SIDE.get()) {
                 case OPPOSITE_MAIN_ARM -> side;
@@ -135,20 +117,17 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
                 case LEFT -> -1;
                 case RIGHT -> 1;
             };
-            // Put the handle beside the posed head, rather than relying on a large rearward
-            // collision correction. The lower, wider sling also keeps the tip near the waist.
-            double x = shield ? 0 : -shoulder * 0.185;
-            double y = shield ? 0.36 : 0.44;
-            double z = 0.145 + armor + depth * scale * depthScale / 2;
-            local.translate(x, y, z);
-            float angle = shield ? 0 : entry.display().is(Items.TRIDENT) ? -30 : entry.shape().sprite() ? -90 : -45;
+            // Restore the approved Phase 3 fit. Small hair/helmet intersections are accepted;
+            // head motion and armor never push the item away or make it disappear.
+            local.translate(0, 0.32, 0.135 + depth * scale * depthScale / 2);
+            float angle = shield ? 0 : entry.display().is(Items.TRIDENT) ? -22 : entry.shape().sprite() ? -75 : -30;
             local.mulPose(Axis.ZP.rotationDegrees(angle * shoulder));
         } else if (anchor == Anchor.HIP) {
-            local.translate(side * (0.27 + armor + depth * scale * depthScale / 2), wingSideHang ? 0.52 : 0.59, 0.23 + armor);
+            local.translate(side * (0.26 + depth * scale / 2), 0.59, 0.23);
             local.mulPose(Axis.YP.rotationDegrees(side * 90));
-            local.mulPose(Axis.ZP.rotationDegrees(wingSideHang ? (shield ? 0 : entry.shape().sprite() ? 45 : 10) : 180));
+            local.mulPose(Axis.ZP.rotationDegrees(180));
         } else {
-            local.translate(side * 0.14, 0.60, 0.14 + armor + depth * scale / 2);
+            local.translate(side * 0.14, 0.60, 0.14 + b.depth() * scale / 2);
             local.mulPose(Axis.ZP.rotationDegrees(170 * side));
         }
         if (entry.override() != null) {

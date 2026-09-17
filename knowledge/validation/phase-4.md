@@ -1,5 +1,8 @@
 # Phase 4 clearance checkpoint — 2026-09-17
 
+Historical checkpoint: Rusty's later D-0006 feedback supersedes these clearance offsets,
+pose hiding and alternate elytra placements. See [the current feedback record](phase-4-feedback.md).
+
 Development only. Releases remain HELD. This is a tested checkpoint, not acceptance of
 every pose, shader or equipment combination in the full brief.
 

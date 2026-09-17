@@ -9,8 +9,8 @@ The development target is the pack's NeoForge 21.1.248. New releases are HELD.
 Rusty's 2026-09-17 answers govern over the original recommendations:
 
 1. A configurable key swaps with the selected hotbar slot. Scrolling remains nine slots.
-2. With elytra or other back gear, use an alternate position only when it fits naturally;
-   otherwise hide the body display while the item remains usable in Quick Slot (D-0005).
+2. Elytra hides every quick-slot body display. Bowl meals are always hidden, with or without
+   elytra. Both rules affect appearance only (D-0006).
 3. Drawing/sheathing has very subtle sound, no added animation.
 4. Inventory slot near offhand, subject to a preview against Curios/SB controls.
 5. Wide flat items may side hang with a visible backpack if the fit looks good, otherwise hide (D-0005).
@@ -23,13 +23,15 @@ Rusty's 2026-09-17 answers govern over the original recommendations:
 11. Third-person presentation is an explicit acceptance gate: inspect front, rear and both
     sides at normal camera distance, plus moving poses, wide/slim skins and worn equipment.
     Judge both scale and orientation in the real game before accepting body placement.
+12. Restore the Earlier model checks placements from Phase 3. Accept minor hair/helmet
+    clipping; do not add automatic armor/head offsets or hide items just because of head pose.
 
 Rusty's subsequent input-priority correction assigns H to Quick Slot outside driving;
 Vanilla Wheels lights take priority for the driver. Passengers keep Quick Slot. Stowed
 must be removed from test profiles; production removal waits for release authorization.
 
 Rendering remains independent of storage and lighting. Planned back/belt classification,
-consumable styles, armor/cape/elytra offsets, visible-backpack detection and resource-reloadable
+consumable styles, equipment visibility, visible-backpack detection and resource-reloadable
 per-item placement overrides follow the full user brief. Normal blocks/armor stay hidden;
 the approved torch/lantern exception gets explicit classification overrides. Supplied defaults
 will cover the actual installed item registries, with optional tag entries for absent mods.
@@ -56,9 +58,13 @@ host processes. See [validation/phase-1.md](validation/phase-1.md) for coverage 
 Phase 2 has the HUD and inventory injection. Phase 3 now has the body layer, measured model
 fitting, classification and initial optional tags. Real captures cover wide/slim skins,
 front/rear/sides, both main arms, Refined Tools/vanilla reload, glint and Fire Aspect variants.
-Phase 4 now has armor offsets, resource placement reload and a revised crouching fit.
-The D-0005 hidden-display fallback prevents large rearward displacement in obstructed poses.
-Its checkpoint passed 29 JUnit tests, 19 server tests and two-client visual/reload/H-swap checks.
+The initial Phase 4 checkpoint added offsets and head collision handling, but Rusty's
+D-0006 feedback supersedes that fit. The approved earlier placement is restored, automatic
+clearance is removed, bowl meals are always hidden and elytra hides every body display.
+Resource placement reload remains. The old Phase 4 checkpoint passed 29 JUnit tests,
+19 server tests and two-client checks; that historical count includes three now-removed
+head collision tests. Current feedback verification passed 26 JUnit tests, 19 server tests
+and two-client captures/H exchanges; see validation/phase-4-feedback.md.
 Cape-equipped runtime, full poses, shaders and full-pack visual acceptance remain open.
 See validation/phase-3.md and validation/phase-4.md for the precise coverage.
 The current proposal places its inventory item at (77, 42), directly above the existing

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static com.chunkworks.quickslot.domain.Presentation.*;
 import org.junit.jupiter.api.Test;
 
-/** Partitions: tag/fallback precedence, edible/named/ordinary blocks, armor/tools, four styles;
+/** Partitions: tag/fallback precedence, edible/named/ordinary blocks, armor/tools, hidden bowls and carried styles;
  * model bounds: tall, wide, deep, offset, invalid and oversized. Real renderer gate is separate. */
 final class PresentationTest {
     private static Facts facts(Anchor tag, Style style, boolean food, boolean named, boolean block,
@@ -27,7 +27,9 @@ final class PresentationTest {
     }
     @Test void drinkBowlAndBucketResolveTheirOwnStyleAndAnchor() {
         assertEquals(new Kind(Anchor.HIP,Style.BOTTLE), classify(facts(null,null,true,false,false,false,false,false,true,false,false)));
-        assertEquals(new Kind(Anchor.HIP,Style.BOWL), classify(facts(null,null,true,false,false,false,false,false,false,true,false)));
+        assertEquals(new Kind(Anchor.HIDDEN,Style.BOWL), classify(facts(null,null,true,false,false,false,false,false,false,true,false)));
+        assertEquals(new Kind(Anchor.HIDDEN,Style.BOWL), classify(facts(Anchor.HIP,Style.BOWL,true,false,false,false,false,false,false,false,false)));
+        assertEquals(new Kind(Anchor.HIDDEN,Style.BOWL), classify(facts(Anchor.HIP,Style.POUCH,true,false,false,false,false,false,false,true,false)));
         assertEquals(new Kind(Anchor.HIP,Style.HANG), classify(facts(null,null,true,false,false,false,false,false,true,false,true)));
         assertEquals(Style.POUCH, classify(facts(null,Style.POUCH,true,false,false,false,false,false,true,false,false)).style());
     }

@@ -25,7 +25,7 @@ public final class Placements extends SimpleJsonResourceReloadListener {
     public record Transform(Vector offset, Vector rotation, double scale) {
         static final Transform IDENTITY = new Transform(Vector.ZERO, Vector.ZERO, 1);
     }
-    public record Override(Anchor anchor, Style style, Transform transform, double armorMultiplier, Transform withBackpack) {}
+    public record Override(Anchor anchor, Style style, Transform transform, Transform withBackpack) {}
     private static Map<ResourceLocation, Override> entries = Map.of();
     /** effects: registers a resource-only placement loader; no data-pack or network authority. */
     public Placements() { super(new Gson(), "quickslot_placement"); }
@@ -43,7 +43,7 @@ public final class Placements extends SimpleJsonResourceReloadListener {
                 JsonObject o = json.getAsJsonObject();
                 Anchor anchor = Anchor.valueOf(o.get("anchor").getAsString().toUpperCase(Locale.ROOT));
                 Style style = o.has("style") ? Style.valueOf(o.get("style").getAsString().toUpperCase(Locale.ROOT)) : null;
-                next.put(item, new Override(anchor, style, transform(o), number(o, "armor_offset_multiplier", 1, 0, 4),
+                next.put(item, new Override(anchor, style, transform(o),
                         o.has("with_backpack") ? transform(o.getAsJsonObject("with_backpack")) : Transform.IDENTITY));
             } catch (RuntimeException bad) {
                 LogUtils.getLogger().warn("Ignoring Quick Slot placement {}: {}", id, bad.toString());

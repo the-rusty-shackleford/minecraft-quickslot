@@ -4,7 +4,7 @@ One extra player item stack for **Minecraft 1.21.1 / NeoForge 21.1.x**.
 Required on both client and server. Java 21, official Mojang mappings.
 
 **Development preview — unreleased.** Storage/sync and the inventory/HUD phases have passed
-their current gates. Initial body display is implemented; equipment clearance and
+their current gates. Body display follows the approved earlier model fit; backpack and
 dynamic-light integration are still in development.
 
 Press **H** to exchange the quick slot with the currently selected hotbar stack.
@@ -65,14 +65,14 @@ controller bindings and human judgement of sound volume remain later compatibili
 
 Body display uses active resource-pack models, including **Refined Tools** where
 provided. Its 3D models resolve through the installed model-selection path;
-the pack deliberately uses different models in GUI/fixed/ground contexts. Scale and clearance
+the pack deliberately uses different models in GUI/fixed/ground contexts. Model bounds
 are measured from vertices emitted by the actual body-display renderer and refreshed on F3+T.
 Quick Slot does not bundle or copy Refined Tools artwork. See [D-0003](knowledge/decisions/D-0003.md).
 Third-person size and orientation are explicit visual gates, including front, rear and
 side views, moving poses, both skin widths and worn equipment.
 
-Large tools use the back; small items use the belt. Consumables have bottle, pouch, bowl
-and hanging styles. Exactly one item is displayed, regardless of stack size. Ordinary blocks,
+Large tools use the back; small items use the belt. Consumables have bottle, pouch
+and hanging styles; bowl meals are always hidden. Exactly one item is displayed, regardless of stack size. Ordinary blocks,
 armor and feast blocks are hidden; torches and lanterns have explicit visible belt overrides.
 Dynamic light from this slot is not implemented yet. Default classification tags live under
 `data/quickslot/tags/item/`; optional entries support Farmer's Delight, Create and other items.
@@ -82,14 +82,19 @@ four viewing angles, Refined Tools/vanilla reload, enchanted model variants and 
 back render. That checkpoint left crouching and equipment clearance for Phase 4.
 See [the Phase 3 record](knowledge/validation/phase-3.md).
 
-The Phase 4 checkpoint adds armor clearance and [reloadable placement resources](knowledge/placement-format.md).
-Back gear uses a natural alternate carry when available; otherwise the body display hides
-while the item stays usable in Quick Slot. With elytra, shields/bows/crossbows are hidden and
-narrow tools use the rear hip. Capes hide back items. Extreme upper-back obstruction also
-hides the display until there is room again. This follows [D-0005](knowledge/decisions/D-0005.md).
-The revised fit passed 29 domain tests, 19 server tests, real-client armor/reload captures
-and hidden-item H swaps. Cape-equipped runtime, the complete pose matrix, shaders and
-backpack/light integration remain open; see [the Phase 4 record](knowledge/validation/phase-4.md).
+The approved appearance restores the earlier model-check placements and accepts minor
+hair/helmet clipping. Armor and head motion do not add offsets or hide the display.
+**Bowl meals always stay hidden. Wearing elytra hides every quick-slot body display**, including
+food, potions and lanterns. Storage and H swaps still work. Removing elytra restores ordinary
+visible items; bowl meals remain hidden. Capes retain the back-item hiding rule.
+This follows [D-0006](knowledge/decisions/D-0006.md), which supersedes the earlier clearance pass.
+[Reloadable placement resources](knowledge/placement-format.md) remain available for manual tuning;
+they cannot override the bowl-meal or elytra visibility rules. Cape-equipped runtime, the complete
+pose matrix, shaders and backpack/light integration remain open. The
+[Phase 4 record](knowledge/validation/phase-4.md) documents the superseded clearance experiment.
+The [current feedback checks](knowledge/validation/phase-4-feedback.md) passed 26 unit tests,
+19 server tests and real-client model/visibility/H-swap checks. Try a bowl meal without
+elytra, then a lantern with elytra: both displays should be hidden and H should still work.
 
 Phase 2 passed 19 server GameTests (the original 12 plus seven menu tests), the 16 real-client
 Phase 1 regressions, and seven additional real-client inventory checks with SB/Curios loaded.

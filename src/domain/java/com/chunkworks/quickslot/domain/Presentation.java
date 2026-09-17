@@ -14,11 +14,12 @@ public final class Presentation {
             boolean namedBlock, boolean block, boolean armor, boolean large,
             boolean hipTool, boolean drink, boolean bowl, boolean bucket) {}
 
-    /** effects: resolves tags first, then consumables before placeable crops and ordinary blocks. */
+    /** effects: always hides bowl meals, otherwise resolves tags before food/crop/block fallbacks. */
     public static Kind classify(Facts f) {
+        if (f.bowl() || f.taggedStyle() == Style.BOWL) return new Kind(Anchor.HIDDEN, Style.BOWL);
         Style style = f.taggedStyle() != null ? f.taggedStyle()
                 : f.bucket() ? Style.HANG : f.drink() ? Style.BOTTLE
-                : f.bowl() ? Style.BOWL : f.consumable() ? Style.POUCH : Style.TOOL;
+                : f.consumable() ? Style.POUCH : Style.TOOL;
         Anchor anchor = f.taggedAnchor();
         if (anchor == null) {
             if (f.consumable()) anchor = Anchor.LOWER_BACK;
@@ -28,7 +29,7 @@ public final class Presentation {
             else anchor = Anchor.LOWER_BACK;
         }
         if (anchor == Anchor.LOWER_BACK && (f.hipTool() || style == Style.BOTTLE
-                || style == Style.BOWL || style == Style.HANG)) anchor = Anchor.HIP;
+                || style == Style.HANG)) anchor = Anchor.HIP;
         return new Kind(anchor, style);
     }
 

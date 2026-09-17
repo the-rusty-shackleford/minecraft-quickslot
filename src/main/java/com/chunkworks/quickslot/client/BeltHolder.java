@@ -49,9 +49,8 @@ final class BeltHolder {
                         .addBox(1.25f, -0.1f, -0.5f, 0.35f, 0.75f, 1.05f);
                 case BOTTLE -> cubes.addBox(-0.25f, 0.8f, -0.3f, 0.5f, 1.15f, 0.3f)
                         .addBox(-0.55f, 0.65f, 0.05f, 1.1f, 0.25f, 0.25f);
-                case BOWL -> cubes.addBox(-1.25f, -1.0f, -0.2f, 2.5f, 0.45f, 0.55f);
                 case HANG -> cubes.addBox(-0.25f, 1.25f, -0.25f, 0.5f, 1.1f, 0.4f);
-                case TOOL -> { continue; }
+                case TOOL, BOWL -> { continue; }
             }
             mesh.getRoot().addOrReplaceChild("holder", cubes, PartPose.ZERO);
             parts.put(style, LayerDefinition.create(mesh, 16, 16).bakeRoot());
