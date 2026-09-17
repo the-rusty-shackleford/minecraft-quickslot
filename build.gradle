@@ -1,0 +1,91 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.144'
+}
+version = mod_version
+group = 'com.chunkworks.quickslot'
+base { archivesName = 'quickslot' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+repositories { mavenCentral(); mavenLocal() }
+
+// Domain and its JUnit tests compile against the JDK alone. The real game tests
+// use their own mod/source set and are excluded from the published artifact.
+sourceSets { domain; gametest }
+var prepareGameTests = tasks.register('prepareGameTests', Copy) {
+    from 'devtools/gameteststructures'
+    into 'run/gametest/gameteststructures'
+}
+neoForge {
+    version = project.neo_version
+    // Official Mojang mappings only: no Parchment overlay.
+    runs {
+        client { client(); gameDirectory = file('run/client') }
+        server { server(); gameDirectory = file('run/server'); programArgument '--nogui' }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.gametest
+            gameDirectory = file('run/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'quickslot'
+            taskBefore prepareGameTests
+        }
+        networkServer {
+            server(); sourceSet = sourceSets.gametest
+            gameDirectory = file('run/network-server'); programArgument '--nogui'
+        }
+        networkDriver {
+            client(); sourceSet = sourceSets.gametest
+            gameDirectory = file('run/network-driver')
+            programArgument '--username'; programArgument 'QuickDriver'
+            systemProperty 'quickslot.testRole', 'driver'
+        }
+        networkObserver {
+            client(); sourceSet = sourceSets.gametest
+            gameDirectory = file('run/network-observer')
+            programArgument '--username'; programArgument 'QuickObserver'
+            systemProperty 'quickslot.testRole', 'observer'
+        }
+        matching { it.name.startsWith('network') }.configureEach {
+            systemProperty 'quickslot.networkTest', 'true'
+            systemProperty 'quickslot.testDir', file('run/network-control').absolutePath
+            systemProperty 'quickslot.testPort', '25586'
+        }
+        configureEach { logLevel = org.slf4j.event.Level.INFO }
+    }
+    mods {
+        quickslot { sourceSet(sourceSets.main); sourceSet(sourceSets.domain) }
+        quickslot_gametest { sourceSet(sourceSets.gametest) }
+    }
+    addModdingDependenciesTo(sourceSets.gametest)
+}
+neoForge.runs.matching { it.name != 'gameTestServer' && !it.name.startsWith('network') }.configureEach {
+    loadedMods = neoForge.mods.matching { it.name != 'quickslot_gametest' }
+}
+dependencies {
+    // Optional at runtime; all references are confined to the guarded compatibility class.
+    compileOnly 'com.chunkworks.vanillawheels:vanillawheels:1.7.0'
+    implementation sourceSets.domain.output
+    gametestImplementation sourceSets.main.output
+    gametestImplementation sourceSets.domain.output
+    gametestCompileOnly 'com.chunkworks.vanillawheels:vanillawheels:1.7.0'
+    testImplementation sourceSets.domain.output
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
+}
+test { useJUnitPlatform() }
+jar { from sourceSets.domain.output }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def releaseVersion = project.version.toString()
+processResources {
+    inputs.property 'version', releaseVersion
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: releaseVersion }
+}
+def gameTestLog = layout.projectDirectory.file('run/gametest/logs/latest.log').asFile
+tasks.named('runGameTestServer') {
+    doLast {
+        def log = gameTestLog.text
+        def passed = log =~ /All (\d+) required tests passed/
+        if (!passed.find()) throw new GradleException('No passing GameTest completion marker')
+        logger.lifecycle("quickslot: all ${passed.group(1)} required GameTests passed")
+    }
+}
+check { dependsOn 'runGameTestServer' }

@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="AGPL-3.0-or-later"
+
+[[mods]]
+modId="quickslot"
+version="${version}"
+displayName="Quick Slot"
+authors="Rusty Shackleford, nfx"
+description='''One additional carried item stack, swapped with the selected hotbar slot.'''
+
+[[dependencies.quickslot]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.248,21.2)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.quickslot]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
