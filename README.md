@@ -7,6 +7,14 @@ Required on both client and server. Java 21, official Mojang mappings.
 their current gates. Body display follows the approved earlier model fit; backpack and
 dynamic-light integration are still in development.
 
+Sophisticated Backpacks worn models use the approved **80% scale**. Six small model-resource
+overrides inherit the mod's artwork and change only its worn display transform; backpack
+capacity and other display contexts retain their original behavior. No backpack-mod mixin is
+used. This interim adjustment follows [D-0007](knowledge/decisions/D-0007.md); it does not
+complete Quick Slot's backpack layering and visibility integration.
+All six chest-slot tiers were inspected in two real clients; Curios and shaders remain
+separate compatibility gates. See the [backpack scale check](knowledge/validation/backpack-scale.md).
+
 Press **H** to exchange the quick slot with the currently selected hotbar stack.
 Rebind **Swap Quick Slot** under Controls → Quick Slot. Scrolling still covers the
 nine hotbar slots. While driving a Vanilla Wheels vehicle, H belongs to its lights;

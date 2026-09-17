@@ -6,3 +6,4 @@
 - [D-0004](D-0004.md): Approved inventory cell, mirrored HUD and vanilla menu interaction.
 - [D-0005](D-0005.md): Natural alternate placement or hidden body display when back gear obstructs it.
 - [D-0006](D-0006.md): Restore the earlier fit, accept minor clipping, always hide bowl meals and every elytra display.
+- [D-0007](D-0007.md): Use the approved 80% worn-backpack scale through model resources.

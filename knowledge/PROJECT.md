@@ -25,6 +25,9 @@ Rusty's 2026-09-17 answers govern over the original recommendations:
     Judge both scale and orientation in the real game before accepting body placement.
 12. Restore the Earlier model checks placements from Phase 3. Accept minor hair/helmet
     clipping; do not add automatic armor/head offsets or hide items just because of head pose.
+13. Sophisticated Backpacks worn models use the approved uniform 80% scale (D-0007).
+    Keep this as a small resource-only adjustment; deeper backpack refinement is deferred
+    in favor of Rusty's future custom backpack mod.
 
 Rusty's subsequent input-priority correction assigns H to Quick Slot outside driving;
 Vanilla Wheels lights take priority for the driver. Passengers keep Quick Slot. Stowed
@@ -66,6 +69,9 @@ Resource placement reload remains. The old Phase 4 checkpoint passed 29 JUnit te
 head collision tests. Current feedback verification passed 26 JUnit tests, 19 server tests
 and two-client captures/H exchanges; see validation/phase-4-feedback.md.
 Cape-equipped runtime, full poses, shaders and full-pack visual acceptance remain open.
+The approved 80% Sophisticated Backpacks worn scale is now supplied by six model-resource
+overrides; all six chest-slot tiers were checked in two real clients with the temporary
+preview pack disabled. See validation/backpack-scale.md. Phase 5 layering remains open.
 See validation/phase-3.md and validation/phase-4.md for the precise coverage.
 The current proposal places its inventory item at (77, 42), directly above the existing
 offhand item at (77, 62). HUD placement mirrors the main arm and reserves attack-indicator
