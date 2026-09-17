@@ -79,8 +79,17 @@ Dynamic light from this slot is not implemented yet. Default classification tags
 
 Phase 3 has 26 domain tests and 19 server tests, plus real-client captures of both skin widths,
 four viewing angles, Refined Tools/vanilla reload, enchanted model variants and H clearing the
-back render. Crouching head clearance, worn equipment, shaders and full-pack compatibility
-are not accepted yet. See [the Phase 3 record](knowledge/validation/phase-3.md).
+back render. That checkpoint left crouching and equipment clearance for Phase 4.
+See [the Phase 3 record](knowledge/validation/phase-3.md).
+
+The Phase 4 checkpoint adds armor clearance and [reloadable placement resources](knowledge/placement-format.md).
+Back gear uses a natural alternate carry when available; otherwise the body display hides
+while the item stays usable in Quick Slot. With elytra, shields/bows/crossbows are hidden and
+narrow tools use the rear hip. Capes hide back items. Extreme upper-back obstruction also
+hides the display until there is room again. This follows [D-0005](knowledge/decisions/D-0005.md).
+The revised fit passed 29 domain tests, 19 server tests, real-client armor/reload captures
+and hidden-item H swaps. Cape-equipped runtime, the complete pose matrix, shaders and
+backpack/light integration remain open; see [the Phase 4 record](knowledge/validation/phase-4.md).
 
 Phase 2 passed 19 server GameTests (the original 12 plus seven menu tests), the 16 real-client
 Phase 1 regressions, and seven additional real-client inventory checks with SB/Curios loaded.

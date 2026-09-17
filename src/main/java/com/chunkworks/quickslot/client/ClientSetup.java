@@ -3,6 +3,7 @@ package com.chunkworks.quickslot.client;
 
 import com.chunkworks.quickslot.Payloads;
 import com.chunkworks.quickslot.QuickSlot;
+import com.chunkworks.quickslot.ClientRules;
 import com.chunkworks.quickslot.compat.Driving;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -17,6 +18,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
@@ -47,6 +49,17 @@ public final class ClientSetup {
     /** effects: clears measured models when the resource pack selection changes or F3+T runs. */
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener((ResourceManagerReloadListener) resources -> BodyLayer.clear());
+        event.registerReloadListener(new Placements());
+    }
+    /** effects: updates cached client configuration when its TOML is loaded or edited. */
+    @SubscribeEvent public static void config(ModConfigEvent event) {
+        if (event.getConfig().getSpec() == ClientRules.SPEC) {
+            // TOML edits may arrive on the file watcher thread; presentation caches are
+            // render-thread confined. Unloading has no config values left to read.
+            if (!(event instanceof ModConfigEvent.Unloading)) Minecraft.getInstance().execute(() -> {
+                EquipmentClearance.reload(); BodyLayer.clear();
+            });
+        }
     }
 
     /** effects: exposes the configurable swap key in Controls. */

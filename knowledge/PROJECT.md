@@ -9,10 +9,11 @@ The development target is the pack's NeoForge 21.1.248. New releases are HELD.
 Rusty's 2026-09-17 answers govern over the original recommendations:
 
 1. A configurable key swaps with the selected hotbar slot. Scrolling remains nine slots.
-2. Keep back items visible with elytra and position them as well as possible; do not default to hiding.
+2. With elytra or other back gear, use an alternate position only when it fits naturally;
+   otherwise hide the body display while the item remains usable in Quick Slot (D-0005).
 3. Drawing/sheathing has very subtle sound, no added animation.
 4. Inventory slot near offhand, subject to a preview against Curios/SB controls.
-5. Wide flat items move to side hang with a visible backpack.
+5. Wide flat items may side hang with a visible backpack if the fit looks good, otherwise hide (D-0005).
 6. A minimal SB pushout hook is allowed if needed; explain the exact hook before writing the mixin.
 7. Torches and lanterns are visible at the hip and emit dynamic light.
 8. Display exactly one item per stack.
@@ -55,8 +56,11 @@ host processes. See [validation/phase-1.md](validation/phase-1.md) for coverage 
 Phase 2 has the HUD and inventory injection. Phase 3 now has the body layer, measured model
 fitting, classification and initial optional tags. Real captures cover wide/slim skins,
 front/rear/sides, both main arms, Refined Tools/vanilla reload, glint and Fire Aspect variants.
-Crouching head clearance remains an observed defect for the Phase 4 clearance pass;
-equipment/shader/full-pack visual acceptance is not complete. See validation/phase-3.md.
+Phase 4 now has armor offsets, resource placement reload and a revised crouching fit.
+The D-0005 hidden-display fallback prevents large rearward displacement in obstructed poses.
+Its checkpoint passed 29 JUnit tests, 19 server tests and two-client visual/reload/H-swap checks.
+Cape-equipped runtime, full poses, shaders and full-pack visual acceptance remain open.
+See validation/phase-3.md and validation/phase-4.md for the precise coverage.
 The current proposal places its inventory item at (77, 42), directly above the existing
 offhand item at (77, 62). HUD placement mirrors the main arm and reserves attack-indicator
 space. Rusty approved the local interactive preview and InventoryMenu injection approach;

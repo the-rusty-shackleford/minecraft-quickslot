@@ -17,6 +17,7 @@ public final class QuickSlot {
         SlotData.TYPES.register(bus);
         bus.addListener(Payloads::register);
         container.registerConfig(ModConfig.Type.SERVER, ServerRules.SPEC);
+        container.registerConfig(ModConfig.Type.CLIENT, ClientRules.SPEC);
     }
 
     /** effects: returns a resource name in this mod's namespace. */

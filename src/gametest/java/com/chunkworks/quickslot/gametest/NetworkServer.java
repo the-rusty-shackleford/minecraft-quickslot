@@ -61,6 +61,11 @@ public final class NetworkServer {
         if (op.equals("quit")) { server.halt(false); return; }
         if (player == null) throw new IllegalStateException("Target not connected");
         switch (op) {
+            case "equip" -> {
+                player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.valueOf(command.get("slot").getAsString()),
+                        item(command.getAsJsonObject("stack")));
+                player.inventoryMenu.broadcastChanges();
+            }
             case "booth" -> {
                 player.serverLevel().setDayTime(6000);
                 player.serverLevel().setWeatherParameters(60000, 0, false, false);

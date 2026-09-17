@@ -49,7 +49,7 @@ public final class NetworkClient {
                     case "inventory" -> KeyMapping.click(game.options.keyInventory.getKey());
                     case "attack" -> KeyMapping.click(game.options.keyAttack.getKey());
                     case "view" -> {
-                        game.options.setCameraType(CameraType.valueOf(command.get("camera").getAsString()));
+                        if (command.has("camera")) game.options.setCameraType(CameraType.valueOf(command.get("camera").getAsString()));
                         game.options.hideGui = command.has("hide") && command.get("hide").getAsBoolean();
                         if (command.has("fov")) game.options.fov().set(command.get("fov").getAsInt());
                         game.options.bobView().set(false);
