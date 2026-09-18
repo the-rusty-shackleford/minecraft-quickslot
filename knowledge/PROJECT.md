@@ -150,3 +150,16 @@ release holds for these two versions above. Clean builds and actual-item server 
 gate publication; a fresh empty-player check gates the production restart. Client
 delivery is through Mod Hub; Rusty updates Prism themselves. The separate materials
 packaging follow-up remains outside this release.
+
+
+## Published release — 2026-09-18, pack 1.40.0
+
+Version 0.1.1 is [published](https://github.com/the-rusty-shackleford/minecraft-quickslot/releases/tag/v0.1.1)
+and deployed through Mod Hub in pack **1.40.0**. The downloaded GitHub asset and
+installed server jar both match SHA-1 `e312364d0d281e705191a229bf167409bbe446be`.
+Clean builds passed; Backpacks+ additionally passed all 45 real-server tests with
+the published dependency versions. Startup confirms both new mods; pack parity is
+clean and the sampled server rate is 20 TPS. A fresh zero-player check preceded
+the restart. Existing world selection, seed, operators and DH configuration were
+preserved. Rusty updates Prism themselves; this release did not modify their client.
+This supersedes the release holds and pending-publication statements for this version.
