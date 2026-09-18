@@ -31,8 +31,11 @@ Apart from those rules, a placement override outranks ordinary render tags.
 Offsets use blocks in the chosen anchor's local axes; rotations use local Euler XYZ degrees.
 Scale multiplies the normalized fit, with back items still capped by maximumBackLength.
 There are no automatic armor/head offsets. Legacy `armor_offset_multiplier` is ignored.
-with_backpack is an additional
-transform for a visibly worn compatible pack; it is parsed now and wired in the backpack phase.
+`with_backpack` adds its offset and XYZ rotation after the ordinary transform and
+multiplies its scale while Backpacks+ is visibly worn. It tunes the hip display; it does
+not make hidden back items, bowl meals or elytra displays visible. Hidden Curios bags and
+held/inventory-only bags do not enable this transform. The obsolete unused backpack
+sling, depth and pushout TOML settings are removed under D-0011.
 Malformed entries log a warning and fall back to ordinary classification. Reload replaces
 the full resource-derived map, so deleting an override also takes effect immediately.
 

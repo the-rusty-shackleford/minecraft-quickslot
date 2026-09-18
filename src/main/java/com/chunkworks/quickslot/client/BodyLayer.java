@@ -32,8 +32,10 @@ import org.joml.Quaternionf;
  */
 public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private record Entry(ItemStack source, ItemStack display, Presentation.Kind kind, RenderedBounds.Shape shape,
-            Placements.Override override, Quaternionf rotation) {}
+            Placements.Override override, Quaternionf rotation, Quaternionf backpackRotation) {}
     private static final Map<AbstractClientPlayer, Entry> ENTRIES = new WeakHashMap<>();
+    private static java.util.function.Predicate<AbstractClientPlayer> visibleBackpack = player -> false;
+    private static final double PACK_HIP_DROP = 0.18;
     private final PoseStack local = new PoseStack();
     private final Matrix4f holder = new Matrix4f();
     private Anchor fittedAnchor;
@@ -41,6 +43,15 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
     public BodyLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) { super(parent); }
     /** effects: invalidates reload-derived classification and model measurements. */
     public static void clear() { ENTRIES.clear(); ItemPresentation.clear(); }
+    /**
+     * requires: client setup thread; supplier reads an existing equipment snapshot without allocating.
+     * effects: installs optional companion visibility. Only a visibly worn pack covers the back;
+     * carried, inventory-only and cosmetically hidden packs must return false.
+     * throws: NullPointerException for a null supplier.
+     */
+    public static void backpackVisibility(java.util.function.Predicate<AbstractClientPlayer> visible) {
+        visibleBackpack = java.util.Objects.requireNonNull(visible);
+    }
 
     private static Entry entry(AbstractClientPlayer player, ItemStack source, int light) {
         ItemStack display = source.copyWithCount(1);
@@ -48,15 +59,18 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         boolean bowlMeal = kind.style() == Presentation.Style.BOWL;
         var override = Placements.get(BuiltInRegistries.ITEM.getKey(display.getItem()));
         Quaternionf rotation = new Quaternionf();
+        Quaternionf backpackRotation = new Quaternionf();
         if (override != null) {
             kind = new Presentation.Kind(override.anchor(), override.style() == null ? kind.style() : override.style());
             var r = override.transform().rotation();
             rotation.rotationXYZ((float) Math.toRadians(r.x()), (float) Math.toRadians(r.y()), (float) Math.toRadians(r.z()));
+            var pack = override.withBackpack().rotation();
+            backpackRotation.rotationXYZ((float) Math.toRadians(pack.x()), (float) Math.toRadians(pack.y()), (float) Math.toRadians(pack.z()));
         }
         if (bowlMeal || kind.style() == Presentation.Style.BOWL)
             kind = new Presentation.Kind(Anchor.HIDDEN, Presentation.Style.BOWL);
         return new Entry(source, display, kind, kind.anchor() == Anchor.HIDDEN ? null
-                : RenderedBounds.measure(player, display, light), override, rotation);
+                : RenderedBounds.measure(player, display, light), override, rotation, backpackRotation);
     }
     @Override public void render(PoseStack pose, MultiBufferSource buffers, int light, AbstractClientPlayer player,
             float swing, float amount, float partial, float age, float yaw, float pitch) {
@@ -69,14 +83,18 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             entry = entry(player, source, light); ENTRIES.put(player, entry);
         }
         if (entry.kind().anchor() == Anchor.HIDDEN) return;
-        if (EquipmentVisibility.cape(player) && entry.kind().anchor() == Anchor.BACK) return;
+        boolean backpack = visibleBackpack.test(player);
+        if ((backpack || EquipmentVisibility.cape(player)) && entry.kind().anchor() == Anchor.BACK) return;
         int side = player.getMainArm() == HumanoidArm.RIGHT ? -1 : 1;
-        fit(entry, player, side);
+        fit(entry, player, side, backpack);
         pose.pushPose();
         getParentModel().body.translateAndRotate(pose);
         if (fittedAnchor != Anchor.BACK) {
             if (fittedAnchor == Anchor.HIP) {
+                pose.pushPose();
+                if (backpack) pose.translate(0, PACK_HIP_DROP, 0);
                 BeltHolder.mount(pose, buffers, light, side);
+                pose.popPose();
             }
             pose.pushPose(); pose.mulPose(holder);
             BeltHolder.render(entry.kind().style(), pose, buffers, light); pose.popPose();
@@ -86,11 +104,12 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
                 false, pose, buffers, player.level(), light, OverlayTexture.NO_OVERLAY, player.getId());
         pose.popPose();
     }
-    private void fit(Entry entry, AbstractClientPlayer player, int side) {
+    private void fit(Entry entry, AbstractClientPlayer player, int side, boolean backpack) {
         local.setIdentity();
         var b = entry.shape().bounds();
         Anchor anchor = entry.kind().anchor();
-        if (anchor == Anchor.LOWER_BACK && EquipmentVisibility.cape(player)) anchor = Anchor.HIP;
+        if (anchor == Anchor.LOWER_BACK && (EquipmentVisibility.cape(player)
+                || backpack && ClientRules.MOVE_BELT.get())) anchor = Anchor.HIP;
         fittedAnchor = anchor;
         boolean flatten = anchor == Anchor.BACK;
         Presentation.Plane plane = flatten ? b.plane() : Presentation.Plane.XY;
@@ -106,7 +125,10 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         boolean shield = entry.display().is(Items.SHIELD);
         if (anchor == Anchor.BACK && shield) length = Math.min(length, 0.73);
         double multiplier = anchor == Anchor.BACK ? ClientRules.BACK_SCALE.get() : ClientRules.BELT_SCALE.get();
-        if (entry.override() != null) multiplier *= entry.override().transform().scale();
+        if (entry.override() != null) {
+            multiplier *= entry.override().transform().scale();
+            if (backpack) multiplier *= entry.override().withBackpack().scale();
+        }
         length *= multiplier;
         if (anchor == Anchor.BACK) length = Math.min(length, ClientRules.MAX_LENGTH.get());
         double scale = b.fit(length);
@@ -123,7 +145,9 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
             float angle = shield ? 0 : entry.display().is(Items.TRIDENT) ? -22 : entry.shape().sprite() ? -75 : -30;
             local.mulPose(Axis.ZP.rotationDegrees(angle * shoulder));
         } else if (anchor == Anchor.HIP) {
-            local.translate(side * (0.26 + depth * scale / 2), 0.59, 0.23);
+            // Keep the approved body fit without a bag. With a visible pack, seat
+            // small gear just below its lower edge instead of burying it in a pocket.
+            local.translate(side * (0.26 + depth * scale / 2), 0.59 + (backpack ? PACK_HIP_DROP : 0), 0.23);
             local.mulPose(Axis.YP.rotationDegrees(side * 90));
             local.mulPose(Axis.ZP.rotationDegrees(180));
         } else {
@@ -133,6 +157,10 @@ public final class BodyLayer extends RenderLayer<AbstractClientPlayer, PlayerMod
         if (entry.override() != null) {
             var o = entry.override().transform().offset();
             local.translate(o.x(), o.y(), o.z()); local.mulPose(entry.rotation());
+            if (backpack) {
+                var pack = entry.override().withBackpack().offset();
+                local.translate(pack.x(), pack.y(), pack.z()); local.mulPose(entry.backpackRotation());
+            }
         }
         holder.set(local.last().pose());
         local.scale((float) scale, (float) scale, (float) (scale * depthScale));

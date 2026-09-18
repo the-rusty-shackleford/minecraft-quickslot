@@ -98,5 +98,6 @@ public final class ClientSlot {
     /** effects: clears all session-specific state on disconnect. */
     @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) {
         PENDING.clear(); ticks = 0; lastSwap = Long.MIN_VALUE; checkedKeys = false;
+        if (ClientSetup.LUMINANCE) LuminanceCompat.clear();
     }
 }

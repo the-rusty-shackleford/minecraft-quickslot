@@ -3,23 +3,14 @@
 One extra player item stack for **Minecraft 1.21.1 / NeoForge 21.1.x**.
 Required on both client and server. Java 21, official Mojang mappings.
 
-**Development preview — unreleased.** Storage/sync and the inventory/HUD phases have passed
-their current gates. Body display follows the approved earlier model fit; backpack and
-dynamic-light integration are still in development.
-
-Sophisticated Backpacks worn models use the approved **80% scale**. Six small model-resource
-overrides inherit the mod's artwork and change only its worn display transform; backpack
-capacity and other display contexts retain their original behavior. No backpack-mod mixin is
-used. This interim adjustment follows [D-0007](knowledge/decisions/D-0007.md); it does not
-complete Quick Slot's backpack layering and visibility integration.
-All six chest-slot tiers were inspected in two real clients; Curios and shaders remain
-separate compatibility gates. See the [backpack scale check](knowledge/validation/backpack-scale.md).
+**Version 0.1.0.** Real extra inventory slot, multiplayer body display, approved
+placement, optional Luminance light and Backpacks+ companion presentation. The coordinated
+release retires Stowed while preserving holsters through the [offline procedure](knowledge/validation/legacy-cutover.md).
 
 Press **H** to exchange the quick slot with the currently selected hotbar stack.
 Rebind **Swap Quick Slot** under Controls → Quick Slot. Scrolling still covers the
 nine hotbar slots. While driving a Vanilla Wheels vehicle, H belongs to its lights;
-Quick Slot is inactive. Passengers retain Quick Slot. Stowed is excluded from test
-profiles because it implements overlapping functionality. B remains the backpack key.
+Quick Slot is inactive. Passengers retain Quick Slot. Remove Stowed when installing Quick Slot because it implements overlapping functionality. B remains the backpack key.
 The client logs unexpected binding conflicts. Successful swaps play
 a very quiet local sound. The server rejects swaps while using an item, while another
 container is open, while dead/spectating, or if the request no longer matches the slot.
@@ -68,8 +59,8 @@ For a manual Phase 1 check in an isolated profile, hold a named or damaged tool,
 select food, and press H again. The complete stacks should exchange, with a very subtle sound.
 Check H while driving and after dismounting, then repeat the exchange after relog or death.
 The slot appears on the HUD, in survival/adventure inventory, and on player models.
-Full-pack input conflicts,
-controller bindings and human judgement of sound volume remain later compatibility checks.
+Later full-pack input/menu checks passed with Controlify loaded. Physical controller
+hardware was unavailable.
 
 Body display uses active resource-pack models, including **Refined Tools** where
 provided. Its 3D models resolve through the installed model-selection path;
@@ -82,7 +73,13 @@ side views, moving poses, both skin widths and worn equipment.
 Large tools use the back; small items use the belt. Consumables have bottle, pouch
 and hanging styles; bowl meals are always hidden. Exactly one item is displayed, regardless of stack size. Ordinary blocks,
 armor and feast blocks are hidden; torches and lanterns have explicit visible belt overrides.
-Dynamic light from this slot is not implemented yet. Default classification tags live under
+With optional Luminance 1.1+, quick-slotted items emit the same dynamic light as held items,
+including other players' synced stacks. Underwater behavior and resource-defined brightness
+come from Luminance; held, mounted and Quick Slot light combine by maximum. Hidden body items
+still emit light. The existing `dynamicLight` client setting disables this contribution.
+See the [lighting verification](knowledge/validation/lighting.md) and
+[actual shader captures](knowledge/validation/lighting/index.html).
+Default classification tags live under
 `data/quickslot/tags/item/`; optional entries support Farmer's Delight, Create and other items.
 
 Phase 3 has 26 domain tests and 19 server tests, plus real-client captures of both skin widths,
@@ -97,8 +94,9 @@ food, potions and lanterns. Storage and H swaps still work. Removing elytra rest
 visible items; bowl meals remain hidden. Capes retain the back-item hiding rule.
 This follows [D-0006](knowledge/decisions/D-0006.md), which supersedes the earlier clearance pass.
 [Reloadable placement resources](knowledge/placement-format.md) remain available for manual tuning;
-they cannot override the bowl-meal or elytra visibility rules. Cape-equipped runtime, the complete
-pose matrix, shaders and backpack/light integration remain open. The
+they cannot override the bowl-meal or elytra visibility rules. The Backpacks+ release record covers the later cape, pose, full-pack and companion checks
+and their limits. Quick Slot
+dynamic lighting now has its separate real-client shader gate. The
 [Phase 4 record](knowledge/validation/phase-4.md) documents the superseded clearance experiment.
 The [current feedback checks](knowledge/validation/phase-4-feedback.md) passed 26 unit tests,
 19 server tests and real-client model/visibility/H-swap checks. Try a bowl meal without
@@ -129,3 +127,14 @@ items. Updates are sent on changes and tracking/lifecycle boundaries, not every 
 ## Licence
 
 Copyright (C) 2026 Rusty Shackleford and nfx. AGPL-3.0-or-later; see [LICENSE](LICENSE).
+
+## Backpacks+ companion fit
+
+A visibly worn Backpacks+ bag hides large Quick Slot back items and moves small lower-back
+items to the hip. Held, inventory-only and cosmetically hidden bags leave the ordinary
+body fit intact. Bowl meals and worn elytra always hide Quick Slot body items. Swaps,
+storage and dynamic light remain independent of body visibility. Per-item `with_backpack`
+transforms apply to visible items and reload with the resource pack.
+
+See [the companion fit decision](knowledge/decisions/D-0011.md) and the Backpacks+
+`devtools/verification/companion-fit.md` capture record. Both mods target the coordinated 0.1.0 release.

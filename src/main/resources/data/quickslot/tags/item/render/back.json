@@ -20,6 +20,18 @@
     {
       "id": "minecraft:mace",
       "required": false
+    },
+    {
+      "id": "alexsmobs:skelewag_sword",
+      "required": false
+    },
+    {
+      "id": "alexsmobs:ghostly_pickaxe",
+      "required": false
+    },
+    {
+      "id": "mowziesmobs:wrought_axe",
+      "required": false
     }
   ]
 }

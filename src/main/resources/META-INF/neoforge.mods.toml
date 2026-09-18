@@ -20,6 +20,13 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.quickslot]]
+modId="luminance"
+type="optional"
+versionRange="[1.1,)"
+ordering="AFTER"
+side="CLIENT"
+
+[[dependencies.quickslot]]
 modId="minecraft"
 type="required"
 versionRange="[1.21.1]"

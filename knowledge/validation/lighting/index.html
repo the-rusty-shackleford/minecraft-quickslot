@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quick Slot — dynamic light</title>
+<style>
+body{margin:0;background:#171916;color:#eee9de;font:17px/1.5 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:32px 20px}h1{font-size:32px;margin:0 0 8px}p{max-width:850px;color:#cbc7bd}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}figure{margin:0;background:#242722;border:1px solid #41463b;border-radius:8px;overflow:hidden}img{width:100%;display:block}figcaption{padding:12px 16px}a{color:#d9bd7b}small{color:#c8c1b2}@media(max-width:700px){.grid{grid-template-columns:1fr}main{padding:20px 12px}}
+</style><main>
+<h1>Quick Slot casts the same light as your hand</h1>
+<p>Actual remote-player captures with Iris and Complementary Unbound. The shader's separate handheld-light effect is disabled. Empty backpack mounts contribute no light in these comparisons.</p>
+<div class="grid">
+<figure><img src="empty.png" alt="Player in a dark stone room with no light source"><figcaption>No carried light</figcaption></figure>
+<figure><img src="slotted-torch.png" alt="The same room lit by the other player's quick-slotted torch"><figcaption>Torch in Quick Slot — level 14</figcaption></figure>
+<figure><img src="held-torch.png" alt="The same room lit by the same torch held in hand"><figcaption>Same torch held — level 14</figcaption></figure>
+<figure><img src="removed.png" alt="Room returns to darkness after the quick-slotted torch is removed"><figcaption>Item removed — light clears</figcaption></figure>
+</div><p><small>Rendering and lighting are independent. Storage, existing placements and gameplay remain unchanged. This is a held development build.</small></p>
+<p><a href="../lighting.md">Verification record</a></p></main></html>

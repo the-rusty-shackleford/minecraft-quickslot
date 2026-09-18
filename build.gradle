@@ -63,6 +63,7 @@ neoForge.runs.matching { it.name != 'gameTestServer' && !it.name.startsWith('net
 dependencies {
     // Optional at runtime; all references are confined to the guarded compatibility class.
     compileOnly 'com.chunkworks.vanillawheels:vanillawheels:1.7.0'
+    compileOnly files('../minecraft-luminance/build/libs/luminance-1.1.0.jar')
     implementation sourceSets.domain.output
     gametestImplementation sourceSets.main.output
     gametestImplementation sourceSets.domain.output
@@ -89,3 +90,12 @@ tasks.named('runGameTestServer') {
     }
 }
 check { dependsOn 'runGameTestServer' }
+
+// Offline operator utility: copied playerdata only; never included in the mod jar.
+tasks.register('prepareLegacyHolsters', JavaExec) {
+    dependsOn 'gametestClasses'
+    classpath = sourceSets.gametest.runtimeClasspath
+    mainClass = 'com.chunkworks.quickslot.gametest.MigrateHolsters'
+    args providers.gradleProperty('legacyInput').getOrElse('run/legacy-input'),
+            providers.gradleProperty('legacyOutput').getOrElse('run/legacy-output')
+}

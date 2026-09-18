@@ -28,6 +28,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = QuickSlot.ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class ClientSetup {
     private ClientSetup() {}
+    static final boolean LUMINANCE = net.neoforged.fml.ModList.get().isLoaded("luminance");
     private static final IKeyConflictContext ON_FOOT = new IKeyConflictContext() {
         @Override public boolean isActive() {
             return KeyConflictContext.IN_GAME.isActive() && !Driving.isDriver(Minecraft.getInstance().player);
@@ -50,6 +51,7 @@ public final class ClientSetup {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener((ResourceManagerReloadListener) resources -> BodyLayer.clear());
         event.registerReloadListener(new Placements());
+        if (LUMINANCE) event.registerReloadListener((ResourceManagerReloadListener) resources -> LuminanceCompat.clear());
     }
     /** effects: updates cached client configuration when its TOML is loaded or edited. */
     @SubscribeEvent public static void config(ModConfigEvent event) {
@@ -69,5 +71,6 @@ public final class ClientSetup {
     /** effects: installs the state receiver once the client mod is initialized. */
     @SubscribeEvent public static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> Payloads.receiveOnClient(ClientSlot::receive));
+        if (LUMINANCE) event.enqueueWork(LuminanceCompat::register);
     }
 }

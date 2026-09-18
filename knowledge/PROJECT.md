@@ -1,3 +1,7 @@
+Current status (2026-09-18): D-0012 authorizes release 0.1.0. Later lighting,
+companion and full-pack records supersede historical open gates below. Live cutover
+awaits the separate private rollback-copy approval.
+
 # Quick Slot
 
 One additional server-owned player item stack for Minecraft 1.21.1, NeoForge 21.1.x,
@@ -45,7 +49,9 @@ will cover the actual installed item registries, with optional tag entries for a
 2. HUD and real InventoryMenu slot, including shift-click and layout review.
 3. Player layer, classification and default tags on wide/slim skins.
 4. Armor, elytra, cape, anti-clipping and placement JSON reload.
-5. Sophisticated Backpacks/Curios detection, layering and clearance.
+5. Backpacks+ integration with visible gear mounts; backpack development moved to
+   `minecraft-backpacks-plus` under D-0008. Sophisticated Backpacks remains installed
+   until a verified migration is ready.
 6. Optional Luminance integration using its existing lookup/provider, including shaders and underwater behavior.
 7. Complete client config, compatibility and polish.
 
@@ -54,6 +60,19 @@ Two rendering test clients are explicitly allowed: Rusty's rule means reuse exis
 where possible and clean up owned instances, not a hard one-client limit. Do not leave idle clients.
 
 ## Current state
+
+D-0009 implements optional Quick Slot lighting through Luminance. The real two-client
+gate checks held-equivalent brightness, backpack/hand maxima, underwater behavior,
+resource reloads, switches, shaders and reconnect/tracking recovery. The relog check
+caught and fixed caching an empty initial stack at revision zero. See
+`validation/lighting.md` for exact results; earlier pending-light lines below are
+historical. Other release gates remain open.
+
+Rusty's release request on 2026-09-17 was followed by "Complete remaining features first"
+and the request to build Backpacks+. Quick Slot is still unreleased. The release audit's
+clean build passed, GitHub had no Quick Slot repository, and the live pack was 1.36.0 with
+Stowed/Sophisticated Backpacks still installed. No publication or deployment occurred.
+Backpack development now belongs to the sibling Backpacks+ repository (D-0008).
 
 Phase 1 passed 19 JUnit tests, 12 real-server GameTests and 16 two-real-client/dedicated-server
 checks on 2026-09-17. Both clients and the server were shut down afterward, verified through
@@ -96,3 +115,17 @@ The personal Prism profile enables Refined Tools 3.0 and contains Modefite
 The diamond sword definition explicitly selects its sprite model for GUI/fixed/ground and
 its 3D tool model otherwise, with a Fire Aspect branch. Visual gates must include that exact
 resource-pack/model-loader combination; plain vanilla model bounds are insufficient.
+
+## Legacy retirement preparation — 2026-09-18
+
+D-0010 implements copied-save holster conversion. The four-player rehearsal migrated two
+complete Stowed stacks; 26 JUnit and 22 real-server GameTests passed. Backpacks+ D-0019
+supersedes lossless backpack migration: discard old bags and all contents, craft new bags.
+Native removal was rehearsed on a disposable server world. See validation/legacy-cutover.md.
+No production change or release occurred.
+
+## Backpacks+ presentation — 2026-09-18
+
+D-0011 records the approved hip/pocket-verse policy for the independent Quick Slot.
+The optional client callback and resource transforms are implemented; real-client
+visual verification is underway. Dedicated backpack mount slots remain unchanged.
