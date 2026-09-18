@@ -80,3 +80,14 @@ The historical rehearsal above did not change production. At the authorized rele
 cutover, the consistent server-local snapshot completed and the native converter verified
 four fresh saves, preparing two holsters. The operator deployment record follows separately.
 Full-pack acceptance and release authorization are now complete.
+
+## Completed deployment
+
+Both 0.1.0 releases shipped with pack 1.38.0 on 2026-09-18. All four fresh saves were
+installed after source/prepared checksum checks; two holsters were preserved. Original
+current/fallback files remain in the private server-local rollback snapshot. Stowed and
+SB/Core are absent, SB SavedData is archived outside the active world, and Curios remains.
+The server's jar hashes match the releases, Mod Hub reports pack parity, and RCON reports
+20 TPS. Live player login has not yet been observed. See the companion
+[deployment record](https://github.com/the-rusty-shackleford/minecraft-backpacks-plus/blob/main/devtools/verification/deployment.md)
+for hashes and exact verification scope.

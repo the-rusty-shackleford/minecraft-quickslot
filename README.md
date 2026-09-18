@@ -48,7 +48,11 @@ The test mod never enters the production jar. `runClient` and `runServer` use se
 development directories. Tests involving two real clients are a separate required gate;
 GameTest player fixtures and codec round trips do not establish multiplayer correctness.
 
-Validated on 2026-09-17: **19 JUnit tests, 12 real-server GameTests, and 16 checks with
+The final 2026-09-18 build passed **26 JUnit and 22 real-server GameTests**, followed by
+full-pack two-client checks with Backpacks+. Version 0.1.0 shipped in pack 1.38.0;
+see the [cutover record](knowledge/validation/legacy-cutover.md).
+
+Earlier Phase 1 validation on 2026-09-17: **19 JUnit tests, 12 real-server GameTests, and 16 checks with
 two actual clients connected to an isolated dedicated server**. Multiplayer coverage includes
 full-stack swaps, invalid requests, tracking reentry, relog, Nether/End travel, death/respawn
 with keepInventory and Vanishing, server retention, and driver/passenger/dismount H priority.

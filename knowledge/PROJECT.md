@@ -1,12 +1,13 @@
-Current status (2026-09-18): D-0012 authorizes release 0.1.0. Later lighting,
-companion and full-pack records supersede historical open gates below. Live cutover
-awaits the separate private rollback-copy approval.
+Current status (2026-09-18): Quick Slot 0.1.0 is published and deployed alongside
+Backpacks+ 0.1.0 in pack 1.38.0 under D-0012. The approved server-local rollback snapshot,
+fresh holster conversion and client/server updates completed. Later lighting, companion
+and full-pack records supersede historical phase gates below.
 
 # Quick Slot
 
 One additional server-owned player item stack for Minecraft 1.21.1, NeoForge 21.1.x,
 Java 21 and official Mojang mappings. Mod ID `quickslot`; namespace `com.chunkworks.quickslot`.
-The development target is the pack's NeoForge 21.1.248. New releases are HELD.
+The development target is the pack's NeoForge 21.1.248. Version 0.1.0 is released.
 
 ## Approved behavior
 
@@ -35,7 +36,7 @@ Rusty's 2026-09-17 answers govern over the original recommendations:
 
 Rusty's subsequent input-priority correction assigns H to Quick Slot outside driving;
 Vanilla Wheels lights take priority for the driver. Passengers keep Quick Slot. Stowed
-must be removed from test profiles; production removal waits for release authorization.
+must be removed from test profiles; production retirement completed in pack 1.38.0.
 
 Rendering remains independent of storage and lighting. Planned back/belt classification,
 consumable styles, equipment visibility, visible-backpack detection and resource-reloadable
@@ -50,8 +51,7 @@ will cover the actual installed item registries, with optional tag entries for a
 3. Player layer, classification and default tags on wide/slim skins.
 4. Armor, elytra, cape, anti-clipping and placement JSON reload.
 5. Backpacks+ integration with visible gear mounts; backpack development moved to
-   `minecraft-backpacks-plus` under D-0008. Sophisticated Backpacks remains installed
-   until a verified migration is ready.
+   `minecraft-backpacks-plus` under D-0008. Sophisticated Backpacks was retired in pack 1.38.0 under the approved discard policy.
 6. Optional Luminance integration using its existing lookup/provider, including shaders and underwater behavior.
 7. Complete client config, compatibility and polish.
 
@@ -66,12 +66,11 @@ gate checks held-equivalent brightness, backpack/hand maxima, underwater behavio
 resource reloads, switches, shaders and reconnect/tracking recovery. The relog check
 caught and fixed caching an empty initial stack at revision zero. See
 `validation/lighting.md` for exact results; earlier pending-light lines below are
-historical. Other release gates remain open.
+historical. The final full-pack release checks are complete.
 
 Rusty's release request on 2026-09-17 was followed by "Complete remaining features first"
-and the request to build Backpacks+. Quick Slot is still unreleased. The release audit's
-clean build passed, GitHub had no Quick Slot repository, and the live pack was 1.36.0 with
-Stowed/Sophisticated Backpacks still installed. No publication or deployment occurred.
+and the request to build Backpacks+. That historical audit held the release. D-0012
+subsequently authorized completion and publication; both 0.1.0 mods are now deployed.
 Backpack development now belongs to the sibling Backpacks+ repository (D-0008).
 
 Phase 1 passed 19 JUnit tests, 12 real-server GameTests and 16 two-real-client/dedicated-server
@@ -87,10 +86,11 @@ Resource placement reload remains. The old Phase 4 checkpoint passed 29 JUnit te
 19 server tests and two-client checks; that historical count includes three now-removed
 head collision tests. Current feedback verification passed 26 JUnit tests, 19 server tests
 and two-client captures/H exchanges; see validation/phase-4-feedback.md.
-Cape-equipped runtime, full poses, shaders and full-pack visual acceptance remain open.
+Later full-pack checks cover cape-equipped runtime, poses and shaders; see the Backpacks+
+release verification record for exact coverage and limits.
 The approved 80% Sophisticated Backpacks worn scale is now supplied by six model-resource
 overrides; all six chest-slot tiers were checked in two real clients with the temporary
-preview pack disabled. See validation/backpack-scale.md. Phase 5 layering remains open.
+preview pack disabled. See validation/backpack-scale.md. D-0011 companion presentation supersedes the old Phase 5 layering proposal.
 See validation/phase-3.md and validation/phase-4.md for the precise coverage.
 The current proposal places its inventory item at (77, 42), directly above the existing
 offhand item at (77, 62). HUD placement mirrors the main arm and reserves attack-indicator
