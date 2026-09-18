@@ -3,7 +3,7 @@
 One extra player item stack for **Minecraft 1.21.1 / NeoForge 21.1.x**.
 Required on both client and server. Java 21, official Mojang mappings.
 
-**Version 0.1.0.** Real extra inventory slot, multiplayer body display, approved
+**Version 0.1.1.** Real extra inventory slot, multiplayer body display, approved
 placement, optional Luminance light and Backpacks+ companion presentation. The coordinated
 release retires Stowed while preserving holsters through the [offline procedure](knowledge/validation/legacy-cutover.md).
 

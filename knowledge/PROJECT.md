@@ -140,3 +140,13 @@ Backpacks+ D-0023. Publication and deployment remain held.
 D-0013 validation complete: 26 JUnit and 22 real-server tests passed. The full pack
 confirmed H independence and mirrored/compact HUD appearance under shaders; see
 Backpacks+ `devtools/verification/explicit-stowing.md`. Release remains held.
+
+
+## Release authorization — 2026-09-18, pack 1.40.0
+
+Rusty explicitly authorized publication and deployment of the backpack mount correction
+and the coordinated Backpacks+ 0.2.0 / Quick Slot 0.1.1 update. This supersedes the
+release holds for these two versions above. Clean builds and actual-item server checks
+gate publication; a fresh empty-player check gates the production restart. Client
+delivery is through Mod Hub; Rusty updates Prism themselves. The separate materials
+packaging follow-up remains outside this release.
