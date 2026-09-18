@@ -26,7 +26,8 @@ exchange stacks; shift-click returns a quick-slot stack to inventory, merging co
 stacks first. Shift-clicking an inventory stack fills an empty quick slot after normal
 armor/offhand auto-equipping takes priority. Number-key exchanges and dropping use normal
 server menu transactions. The HUD mirrors your main arm, shows count/durability, and leaves
-space for the hotbar attack indicator. It briefly highlights a confirmed H swap.
+space for the hotbar attack indicator. Since 0.1.1, it uses the active resource pack's
+vanilla hotbar frame and briefly highlights a confirmed H swap with the vanilla selection border.
 
 **Creative limitation:** use H. The clickable cell is disabled in creative inventory,
 whose vanilla item-creation protocol accepts only the original slot indices. Its other

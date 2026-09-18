@@ -21,6 +21,8 @@ import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 @EventBusSubscriber(modid = QuickSlot.ID, value = Dist.CLIENT)
 public final class SlotGui {
     private static final ResourceLocation INVENTORY = ResourceLocation.withDefaultNamespace("textures/gui/container/inventory.png");
+    private static final ResourceLocation HOTBAR = ResourceLocation.withDefaultNamespace("hud/hotbar");
+    private static final ResourceLocation SELECTED = ResourceLocation.withDefaultNamespace("hud/hotbar_selection");
     private SlotGui() {}
 
     /** effects: renders one HUD cell opposite offhand with permanent hotbar-attack clearance. */
@@ -46,8 +48,10 @@ public final class SlotGui {
     }
 
     private static void frame(GuiGraphics graphics, int x, int y, boolean active) {
-        graphics.fill(x, y, x + 22, y + 22, active ? 0xffd4f2b8 : 0xffbcbcbc);
-        graphics.fill(x, y, x + 21, y + 21, active ? 0xff688751 : 0xff373737);
-        graphics.fill(x + 1, y + 1, x + 21, y + 21, 0xff8b8b8b);
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        graphics.blitSprite(HOTBAR, 182, 22, 0, 0, x, y, 11, 22);
+        graphics.blitSprite(HOTBAR, 182, 22, 171, 0, x + 11, y, 11, 22);
+        if (active) graphics.blitSprite(SELECTED, x - 1, y - 1, 24, 23);
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
     }
 }

@@ -13,3 +13,5 @@
 - [D-0011](D-0011.md): Visible Backpacks+ moves small Quick Slot items to the hip and hides large back items.
 
 - [D-0012](D-0012.md): Coordinated release authorized; fresh holster conversion and private rollback backup.
+
+- [D-0013](D-0013.md): Use vanilla hotbar sprites for the HUD and confirmed-swap highlight.

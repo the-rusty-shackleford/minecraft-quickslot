@@ -129,3 +129,14 @@ No production change or release occurred.
 D-0011 records the approved hip/pocket-verse policy for the independent Quick Slot.
 The optional client callback and resource transforms are implemented; real-client
 visual verification is underway. Dedicated backpack mount slots remain unchanged.
+
+## Hotbar HUD — 2026-09-18, unreleased
+
+Version 0.1.1 implements D-0013: use vanilla hotbar and selection sprites, honoring
+resource packs while retaining cell placement, H behavior and inventory data.
+Existing domain and real-server checks passed. Visual evidence is recorded with
+Backpacks+ D-0023. Publication and deployment remain held.
+
+D-0013 validation complete: 26 JUnit and 22 real-server tests passed. The full pack
+confirmed H independence and mirrored/compact HUD appearance under shaders; see
+Backpacks+ `devtools/verification/explicit-stowing.md`. Release remains held.
