@@ -3,6 +3,7 @@ package com.chunkworks.quickslot;
 
 import com.chunkworks.quickslot.domain.SlotRules;
 import com.chunkworks.quickslot.compat.Driving;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -80,15 +81,27 @@ public final class Slot {
         player.setData(SlotData.REVISION, Math.incrementExact(SlotData.revision(player)));
     }
 
-    /** effects: sends current state to the owner and existing observers; no mutation. */
+    /** effects: returns whether the player's connection negotiated the payload's channel; a test's mock or a client mid-handshake has not. */
+    private static boolean listens(ServerPlayer player, CustomPacketPayload payload) {
+        return player.connection != null && player.connection.hasChannel(payload);
+    }
+
+    /**
+     * effects: sends current state to existing observers, and to the owner only if their
+     * connection can take it, so an unnegotiated connection is skipped rather than an
+     * exception aborting the event for every later listener; no mutation.
+     */
     public static void broadcast(Player player, boolean swapped) {
         if (player instanceof ServerPlayer server) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(server, Payloads.State.of(server, swapped));
+            Payloads.State state = Payloads.State.of(server, swapped);
+            PacketDistributor.sendToPlayersTrackingEntity(server, state);
+            if (listens(server, state)) PacketDistributor.sendToPlayer(server, state);
         }
     }
 
-    /** effects: sends one tracking snapshot to a newly interested observer. */
+    /** effects: sends one tracking snapshot to a newly interested observer whose connection can take it. */
     public static void syncTo(ServerPlayer owner, ServerPlayer observer) {
-        PacketDistributor.sendToPlayer(observer, Payloads.State.of(owner, false));
+        Payloads.State state = Payloads.State.of(owner, false);
+        if (listens(observer, state)) PacketDistributor.sendToPlayer(observer, state);
     }
 }

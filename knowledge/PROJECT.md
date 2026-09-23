@@ -163,3 +163,15 @@ clean and the sampled server rate is 20 TPS. A fresh zero-player check preceded
 the restart. Existing world selection, seed, operators and DH configuration were
 preserved. Rusty updates Prism themselves; this release did not modify their client.
 This supersedes the release holds and pending-publication statements for this version.
+
+## Sync guard — 0.1.2 (2026-09-23), unreleased
+
+`Slot.broadcast` and `Slot.syncTo` sent the state payload to any server player;
+NeoForge refuses a payload for a connection that never negotiated its channel and the
+exception left the listener, taking every later listener of that event down with it
+(issue #1, found when Backpacks+'s test server made a mock server player with Quick Slot
+loaded). Sends now go only to connections that negotiated the channel
+(`ICommonPacketListener.hasChannel`); observers still get the broadcast. Play is
+unaffected, since a real client always negotiates. Pinned by
+`SyncGameTests.aPlayerWithoutTheChannelIsSkippedNotCrashed`. Release with the next pack
+update; no protocol or data change.
