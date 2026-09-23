@@ -175,3 +175,11 @@ loaded). Sends now go only to connections that negotiated the channel
 unaffected, since a real client always negotiates. Pinned by
 `SyncGameTests.aPlayerWithoutTheChannelIsSkippedNotCrashed`. Release with the next pack
 update; no protocol or data change.
+
+## Published and deployed — 2026-09-23, pack 1.57.1
+
+Version 0.1.2 is [published](https://github.com/the-rusty-shackleford/minecraft-quickslot/releases/tag/v0.1.2)
+and deployed through Mod Hub in pack **1.57.1**, replacing 0.1.1. Release asset, tested jar
+and installed server jar match SHA-1 `fc2d3f623aaecac9c4acf1ed7dc2b9079034ab32`. Restart
+23:06:21 UTC with nobody online after the warning; ready at 23:06:35, 20 TPS, Mod Hub parity
+clean. Issue #1 closed by the release.
