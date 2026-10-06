@@ -1,0 +1,5 @@
+{"shots": [
+  {"from": "run/network-driver/screenshots/phase3-fit-own-back.png", "to": "img/on-back.webp"},
+  {"from": "run/network-driver/screenshots/quick-fit-wide-left-lantern.png", "to": "img/lantern.webp"},
+  {"from": "run/network-driver/screenshots/phase3-inventory-state-a.png", "to": "img/inventory.webp"}
+]}
